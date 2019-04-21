@@ -173,6 +173,7 @@ class RNN():
         self.u_weights -= u_weights_update * self.l_rate
         self.v_weights -= v_weights_update * self.l_rate
         self.w_weights -= w_weights_update * self.l_rate
+        return np.mean(u_weights_update), np.mean(v_weights_update), np.mean(w_weights_update)
 
 
 def check_accuracy(pred, ans):
@@ -187,15 +188,20 @@ def main():
     # x, y = gen_data(100)
     rnn_net = RNN(learning_rate=0.1, act_loss='tanh_softplus')
     acc_list = []
+    update_rate = {'u': [], 'v': [], 'w': []}
     for count in range(20000):
         pred_y, gt = rnn_net.train(count+1)
-        rnn_net.backward()
+        u, v, w = rnn_net.backward()
         acc_list.append(check_accuracy(pred_y, gt))
+        update_rate['u'].append(u)
+        update_rate['v'].append(v)
+        update_rate['w'].append(w)
     print('last {} accuracy: {}%'.format(rnn_net.accsize, rnn_net.get_accuracy() * 100))
     
     with open('rnn_record.json', 'w') as f:
         json.dump({
             'accuracy': acc_list,
+            'update_rate': update_rate
         }, f)
 
 
