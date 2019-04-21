@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def show_result(x):
     fig, ax = plt.subplots()
-    ax.plot(len(x), x*100)
+    ax.plot(range(len(x)), x)
 
     ax.set_xlabel("step")
     ax.set_ylabel("error_rate (%)")
