@@ -6,23 +6,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def show_result(acc, up_rate):
-    fig, (ax1, ax2) = plt.subplots(2, 1)
+    fig, axs = plt.subplots(4, 1)
+    fig.subplots_adjust(hspace=0.5)
+    for ax in axs:
+        ax.set_xlabel("step")
+        ax.legend()
+        ax.grid()
 
-    ax1.plot(range(len(acc)), acc)
-    ax1.set_xlabel("step")
-    ax1.set_ylabel("error_rate (%)")
-    ax1.legend()
-    ax1.grid()
-    ax1.set_title("BPTT error rate")
+    axs[0].plot(range(len(acc)), acc)
+    axs[0].set_ylabel("error_rate (%)")
+    axs[0].set_title("BPTT error rate")
 
-    ax2.plot(range(len(up_rate['u'])), up_rate['u'], label='u')
-    ax2.plot(range(len(up_rate['v'])), up_rate['v'], label='v')
-    ax2.plot(range(len(up_rate['w'])), up_rate['w'], label='w')
-    ax2.set_xlabel("step")
-    ax2.set_ylabel("update rewards")
-    ax2.legend()
-    ax2.grid()
-    ax2.set_title("BPTT episode rewards")
+    axs[1].plot(range(len(up_rate['u'][:10000])), up_rate['u'][:10000], label='u')
+    axs[1].set_ylabel("u's update rewards")
+    axs[2].plot(range(len(up_rate['v'][:10000])), up_rate['v'][:10000], label='v')
+    axs[2].set_ylabel("v's update rewards")
+    axs[3].plot(range(len(up_rate['w'][:10000])), up_rate['w'][:10000], label='w')
+    axs[3].set_ylabel("w's update rewards")
     plt.show()
 
 
