@@ -180,7 +180,7 @@ def check_accuracy(pred, ans):
     for i in range(BIN_DIM):
         if pred[i] != ans[i]:
             error_count += 1
-    return error_count / BIN_DIM * 100
+    return error_count / float(BIN_DIM) * 100
 
 
 def main():

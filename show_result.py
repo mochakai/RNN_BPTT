@@ -13,7 +13,7 @@ def show_result(x):
     ax.set_ylabel("error_rate (%)")
     ax.legend()
     ax.grid()
-    ax.set_title("Actvation function comparision ({})".format(model_name))
+    ax.set_title("BPTT error rate")
     plt.show()
 
 
