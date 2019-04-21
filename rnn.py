@@ -141,6 +141,16 @@ class RNN():
             pred_y.append(np.round(out_o[0][0]))
             self.h_values.append(out_h.copy())
             
+        pred_y = np.array(pred_y, dtype=np.int8)[::-1]
+        if step % 2000 == 0:
+            print('-'*10, 'step', step, '-'*10)
+            print('total error:', total_error)
+            print('pred:', pred_y)
+            print('true:', gt.flatten())
+        self.last_acc(pred_y, gt.flatten())
+        return pred_y
+
+    def backward(self):
         u_weights_update = np.zeros_like(self.u_weights)
         v_weights_update = np.zeros_like(self.v_weights)
         w_weights_update = np.zeros_like(self.w_weights)
@@ -162,27 +172,13 @@ class RNN():
         self.u_weights -= u_weights_update * self.l_rate
         self.v_weights -= v_weights_update * self.l_rate
         self.w_weights -= w_weights_update * self.l_rate
-        pred_y = np.array(pred_y, dtype=np.int8)[::-1]
-
-        if step % 2000 == 0:
-            print('-'*10, 'step', step, '-'*10)
-            print('total error:', total_error)
-            print('pred:', pred_y)
-            print('true:', gt.flatten())
-        self.last_acc(pred_y, gt.flatten())
-        return pred_y
-
-    def backward(self):
-        pass
 
 
 def main():
     # x, y = gen_data(100)
     rnn_net = RNN(learning_rate=0.1, act_loss='tanh_softplus')
-    count = 0
-    for epoch in range(20000):
-        count += 1
-        pred_y = rnn_net.train(count)
+    for count in range(20000):
+        pred_y = rnn_net.train(count+1)
         rnn_net.backward()
     print('last {} accuracy: {}%'.format(rnn_net.accsize, rnn_net.get_accuracy() * 100))
 
