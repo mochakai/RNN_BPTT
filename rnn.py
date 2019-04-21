@@ -1,6 +1,6 @@
 import os
 import sys
-import copy
+import json
 
 import numpy as np
 
@@ -142,13 +142,14 @@ class RNN():
             self.h_values.append(out_h.copy())
             
         pred_y = np.array(pred_y, dtype=np.int8)[::-1]
+        ground_truth = gt.flatten()
         if step % 2000 == 0:
             print('-'*10, 'step', step, '-'*10)
             print('total error:', total_error)
             print('pred:', pred_y)
-            print('true:', gt.flatten())
-        self.last_acc(pred_y, gt.flatten())
-        return pred_y
+            print('true:', ground_truth)
+        self.last_acc(pred_y, ground_truth)
+        return pred_y, ground_truth
 
     def backward(self):
         u_weights_update = np.zeros_like(self.u_weights)
@@ -174,13 +175,28 @@ class RNN():
         self.w_weights -= w_weights_update * self.l_rate
 
 
+def check_accuracy(pred, ans):
+    error_count = 0
+    for i in range(BIN_DIM):
+        if pred[i] != ans[i]:
+            error_count += 1
+    return error_count / BIN_DIM
+
+
 def main():
     # x, y = gen_data(100)
     rnn_net = RNN(learning_rate=0.1, act_loss='tanh_softplus')
+    acc_list = []
     for count in range(20000):
-        pred_y = rnn_net.train(count+1)
+        pred_y, gt = rnn_net.train(count+1)
         rnn_net.backward()
+        acc_list.append(check_accuracy(pred_y, gt))
     print('last {} accuracy: {}%'.format(rnn_net.accsize, rnn_net.get_accuracy() * 100))
+    
+    with open('rnn_record.json', 'w') as f:
+        json.dump({
+            'accuracy': acc_list,
+        }, f)
 
 
 if __name__ == "__main__":
