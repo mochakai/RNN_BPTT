@@ -7,22 +7,22 @@ import matplotlib.pyplot as plt
 
 def show_result(acc, up_rate):
     fig, axs = plt.subplots(4, 1)
-    fig.subplots_adjust(hspace=0.5)
-    for ax in axs:
-        ax.set_xlabel("step")
-        ax.legend()
-        ax.grid()
 
     axs[0].plot(range(len(acc)), acc)
     axs[0].set_ylabel("error_rate (%)")
     axs[0].set_title("BPTT error rate")
 
     axs[1].plot(range(len(up_rate['u'][:10000])), up_rate['u'][:10000], label='u')
-    axs[1].set_ylabel("u's update rewards")
+    axs[1].set_ylabel("u")
     axs[2].plot(range(len(up_rate['v'][:10000])), up_rate['v'][:10000], label='v')
-    axs[2].set_ylabel("v's update rewards")
+    axs[2].set_ylabel("v")
     axs[3].plot(range(len(up_rate['w'][:10000])), up_rate['w'][:10000], label='w')
-    axs[3].set_ylabel("w's update rewards")
+    axs[3].set_ylabel("w")
+    
+    fig.subplots_adjust(hspace=0.5)
+    for ax in axs:
+        ax.set_xlabel("step")
+        ax.grid()
     plt.show()
 
 

@@ -93,7 +93,8 @@ class RNN():
         self.l_rate = learning_rate
         self.output_val = [np.zeros(in_hidden_out_dim[1])]
         self.acc_list = []
-        self.accsize = 1000
+        self.accsize = 1000.0
+        self.l_threshold = 0.1
     
     def init_weights(self, dimension):
         '''
@@ -117,7 +118,7 @@ class RNN():
     def get_accuracy(self):
         return np.sum(self.acc_list) / self.accsize
 
-    def train(self, step):
+    def forward(self, step):
         x, y = gen_single_data()
         self.input_x = np.expand_dims(x, 1)
         gt = np.expand_dims(y, 1)
@@ -170,10 +171,13 @@ class RNN():
             
             future_out_h_delta = out_h_delta
             
-        self.u_weights -= u_weights_update * self.l_rate
-        self.v_weights -= v_weights_update * self.l_rate
-        self.w_weights -= w_weights_update * self.l_rate
+        self.u_weights -= self._clipping(u_weights_update) * self.l_rate
+        self.v_weights -= self._clipping(v_weights_update) * self.l_rate
+        self.w_weights -= self._clipping(w_weights_update) * self.l_rate
         return np.mean(u_weights_update), np.mean(v_weights_update), np.mean(w_weights_update)
+
+    def _clipping(self, weights):
+        return weights * self.l_threshold / np.linalg.norm(weights) if np.linalg.norm(weights) > self.l_threshold else weights
 
 
 def check_accuracy(pred, ans):
@@ -186,13 +190,14 @@ def check_accuracy(pred, ans):
 
 def main():
     # x, y = gen_data(100)
-    rnn_net = RNN(learning_rate=0.1, act_loss='tanh_softplus')
+    rnn_net = RNN(learning_rate=0.1, act_loss='mse')
     acc_list = []
     update_rate = {'u': [], 'v': [], 'w': []}
     for count in range(20000):
-        pred_y, gt = rnn_net.train(count+1)
+        pred_y, gt = rnn_net.forward(count+1)
         u, v, w = rnn_net.backward()
         acc_list.append(check_accuracy(pred_y, gt))
+        # acc_list.append(rnn_net.get_accuracy() * 100)
         update_rate['u'].append(u)
         update_rate['v'].append(v)
         update_rate['w'].append(w)
